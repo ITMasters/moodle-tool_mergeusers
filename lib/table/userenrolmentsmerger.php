@@ -98,7 +98,7 @@ class UserEnrolmentsMerger extends GenericTableMerger
                         ': ' . $DB->get_last_error();
             }
         }
-        unset($enrolmentsToUpdate); //free memory
+        
         unset($sql);
 
         // ok, now let's lock this user out from using the common courses.
@@ -118,6 +118,25 @@ class UserEnrolmentsMerger extends GenericTableMerger
         unset($idsToDisable); //free memory
         unset($sql);
 
+		// Need to update external enrollments database
+		if (!empty($enrolmentsToUpdate)) {
+			$fromuser = get_record('user', 'id', $data['fromid']);
+			$touser = get_record('user', 'id', $data['toid']);
+			$sql = "UPDATE learnitm_moodleimport.enrolments SET `email` = ? WHERE `email` = ?";
+			$params = array($touser->email,$fromuser->email);
+			if ($DB->execute($sql,params)) {
+                //all was ok: action done.
+                $actionLog[] = $sql;
+            } else {
+                // a database error occurred.
+                $errorMessages[] = "Error updating external enrollment table: " . $DB->get_last_error();
+            }
+			unset($fromuser);
+			unset($touser);
+		}
+
+		unset($enrolmentsToUpdate); //free memory
+		unset($sql);
         // the enrolment was deactivated before by us.
         // reactivate it again.
         if (!empty($enrolmentsToReactivate)) {
