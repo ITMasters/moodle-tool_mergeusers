@@ -120,8 +120,8 @@ class UserEnrolmentsMerger extends GenericTableMerger
 
 		// Need to update external enrollments database
 		if (!empty($enrolmentsToUpdate)) {
-			$fromuser = get_record('user', 'id', $data['fromid']);
-			$touser = get_record('user', 'id', $data['toid']);
+			$fromuser = $DB->get_record('user', 'id', $data['fromid']);
+			$touser = $DB->get_record('user', 'id', $data['toid']);
 			$sql = "UPDATE learnitm_moodleimport.enrolments SET `email` = ? WHERE `email` = ?";
 			$params = array($touser->email,$fromuser->email);
 			if ($DB->execute($sql,params)) {
