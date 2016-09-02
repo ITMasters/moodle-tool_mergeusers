@@ -122,9 +122,8 @@ class UserEnrolmentsMerger extends GenericTableMerger
 		if (!empty($enrolmentsToUpdate)) {
 			$fromuser = $DB->get_record('user', array('id'=>$data['fromid']));
 			$touser = $DB->get_record('user', array('id'=>$data['toid']));
-			$sql = "UPDATE learnitm_moodleimport.enrolments SET `email` = ? WHERE `email` = ?";
-			$params = array($touser->email,$fromuser->email);
-			if ($DB->execute($sql,params)) {
+			$sql = "UPDATE learnitm_moodleimport.enrolments SET `email` = '". $touser->email ."' WHERE `email` = '" .$fromuser->email . "'";
+			if ($DB->execute($sql)) {
                 //all was ok: action done.
                 $actionLog[] = $sql;
             } else {
